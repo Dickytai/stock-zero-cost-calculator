@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票0成本計算器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .mode-btn.active {
+            border-color: #4CAF50;
+            background: #4CAF50;
+            color: white;
+        }
+        .optional-section {
+            display: none;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .optional-section.show {
+            display: block;
+        }
+        .optional-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        .optional-toggle input {
+            width: auto;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border-radius: 10px;
+            color: white;
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            opacity: 0.9;
+        }
+        .result-value {
+            font-weight: bold;
+        }
+        .highlight {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 股票0成本計算器</h1>
+        
+        <div class="mode-toggle">
+            <button class="mode-btn active" onclick="setMode('basic')">基本模式</button>
+            <button class="mode-btn" onclick="setMode('profit')">目標獲利模式</button>
+        </div>
+
+        <div class="input-group">
+            <label>買入價格 (HKD)</label>
+            <input type="number" id="buyPrice" placeholder="例如：10.50" step="0.001" min="0">
+            <div class="error" id="buyPriceError">請輸入買入價格</div>
+        </div>
+
+        <div class="input-group">
+            <label>買入股數</label>
+            <input type="number" id="shares" placeholder="例如：1000" step="1" min="1">
+            <div class="error" id="sharesError">請輸入入股數</div>
+        </div>
+
+        <div class="input-group">
+            <label>目標價格 (HKD)</label>
+            <input type="number" id="targetPrice" placeholder="例如：15.00" step="0.001" min="0">
+            <div class="error" id="targetPriceError">請輸入目標價格</div>
+        </div>
+
+        <div class="optional-section show" id="basicResultSection">
+            <div class="highlight" id="basicSummary"></div>
+        </div>
+
+        <div class="optional-section" id="profitSection">
+            <label>目標獲利 (HKD)</label>
+            <input type="number" id="targetProfit" placeholder="例如：500" step="0.01" min="0">
+        </div>
+
+        <button onclick="calculate()">計算</button>
+
+        <div class="result" id="result">
+            <div id="resultContent"></div>
+            <div class="highlight" id="summary"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'basic';
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const profitSection = document.getElementById('profitSection');
+            const result = document.getElementById('result');
+            
+            if (mode === 'profit') {
+                profitSection.classList.add('show');
+                document.getElementById('basicResultSection').classList.remove('show');
+            } else {
+                profitSection.classList.remove('show');
+                document.getElementById('basicResultSection').classList.add('show');
+            }
+            result.classList.remove('show');
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString('zh-HK', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function formatShares(num) {
+            return num.toLocaleString('zh-HK');
+        }
+
+        function validateInputs() {
+            let valid = true;
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value);
+            const shares = parseInt(document.getElementById('shares').value);
+            const targetPrice = parseFloat(document.getElementById('targetPrice').value);
+
+            // Reset errors
+            document.querySelectorAll('.error').forEach(e => e.style.display = 'none');
+
+            if (isNaN(buyPrice) || buyPrice <= 0) {
+                document.getElementById('buyPriceError').style.display = 'block';
+                valid = false;
+            }
+            if (isNaN(shares) || shares <= 0) {
+                document.getElementById('sharesError').style.display = 'block';
+                valid = false;
+            }
+            if (isNaN(targetPrice) || targetPrice <= 0) {
+                document.getElementById('targetPriceError').style.display = 'block';
+                valid = false;
+            }
+
+            return valid;
+        }
+
+        function calculate() {
+            if (!validateInputs()) return;
+
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value);
+            const shares = parseInt(document.getElementById('shares').value);
+            const targetPrice = parseFloat(document.getElementById('targetPrice').value);
+            const targetProfit = parseFloat(document.getElementById('targetProfit').value) || 0;
+
+            const totalCost = buyPrice * shares;
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            const summary = document.getElementById('summary');
+            const basicSummary = document.getElementById('basicSummary');
+
+            if (currentMode === 'basic') {
+                // 基本模式：計算0成本需要賣出多少股
+                // 賣出股數 × 目標價格 = 總成本
+                // 賣出股數 = 總成本 / 目標價格
+                const sharesToSell = Math.ceil((totalCost / targetPrice) * 100) / 100;
+                const remainingShares = shares - sharesToSell;
+                const proceeds = sharesToSell * targetPrice;
+                const remainingCost = totalCost - proceeds;
+
+                resultContent.innerHTML = `
+                    <div class="result-item">
+                        <span class="result-label">總買入成本</span>
+                        <span class="result-value">HK$ ${formatNumber(totalCost)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">買入均價</span>
+                        <span class="result-value">HK$ ${formatNumber(buyPrice)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">買入股數</span>
+                        <span class="result-value">${formatShares(shares)} 股</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">目標價格</span>
+                        <span class="result-value">HK$ ${formatNumber(targetPrice)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">需賣出股數</span>
+                        <span class="result-value" style="color: #FFD700;">${formatNumber(sharesToSell)} 股</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">賣出所得</span>
+                        <span class="result-value">HK$ ${formatNumber(proceeds)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">剩餘股數</span>
+                        <span class="result-value">${formatNumber(remainingShares)} 股</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">剩餘成本</span>
+                        <span class="result-value">HK$ ${formatNumber(remainingCost)}</span>
+                    </div>
+                `;
+
+                summary.innerHTML = `
+                    賣出 <strong>${formatNumber(sharesToSell)}</strong> 股後，<br>
+                    剩餘 <strong>${formatNumber(remainingShares)}</strong> 股為0成本持有
+                `;
+            } else {
+                // 目標獲利模式
+                // 總賣出所得 = 總成本 + 目標獲利
+                // 賣出股數 = (總成本 + 目標獲利) / 目標價格
+                const targetProceeds = totalCost + targetProfit;
+                const sharesToSell = Math.ceil((targetProceeds / targetPrice) * 100) / 100;
+                const remainingShares = shares - sharesToSell;
+                const actualProfit = (sharesToSell * targetPrice) - totalCost;
+                const remainingCost = totalCost - (sharesToSell * targetPrice);
+
+                resultContent.innerHTML = `
+                    <div class="result-item">
+                        <span class="result-label">總買入成本</span>
+                        <span class="result-value">HK$ ${formatNumber(totalCost)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">買入均價</span>
+                        <span class="result-value">HK$ ${formatNumber(buyPrice)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">買入股數</span>
+                        <span class="result-value">${formatShares(shares)} 股</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">目標價格</span>
+                        <span class="result-value">HK$ ${formatNumber(targetPrice)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">目標獲利</span>
+                        <span class="result-value">HK$ ${formatNumber(targetProfit)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">需賣出股數</span>
+                        <span class="result-value" style="color: #FFD700;">${formatNumber(sharesToSell)} 股</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">賣出所得</span>
+                        <span class="result-value">HK$ ${formatNumber(targetProceeds)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">實際獲利</span>
+                        <span class="result-value">HK$ ${formatNumber(actualProfit)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">剩餘股數</span>
+                        <span class="result-value">${formatNumber(remainingShares)} 股</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">剩餘成本</span>
+                        <span class="result-value">HK$ ${formatNumber(remainingCost)}</span>
+                    </div>
+                `;
+
+                summary.innerHTML = `
+                    賣出 <strong>${formatNumber(sharesToSell)}</strong> 股，<br>
+                    獲利 <strong>HK$ ${formatNumber(targetProfit)}</strong>，<br>
+                    剩餘 <strong>${formatNumber(remainingShares)}</strong> 股為0成本持有
+                `;
+            }
+
+            resultDiv.classList.add('show');
+        }
+    </script>
+</body>
+</html>
