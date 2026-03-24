@@ -88,34 +88,7 @@
         input[type="number"]::placeholder {
             color: var(--text-muted);
         }
-        .mode-toggle {
-            display: flex;
-            gap: 8px;
-        }
-        .mode-btn {
-            flex: 1;
-            padding: 10px 16px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            font-family: var(--font);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .mode-btn:hover {
-            border-color: var(--text-muted);
-        }
-        .mode-btn.active {
-            background: var(--bg-primary);
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
         .slider-section {
-            display: none;
-        }
-        .slider-section.show {
             display: block;
         }
         .slider-header {
@@ -167,22 +140,6 @@
             margin-top: 8px;
             font-size: 0.7rem;
             color: var(--text-muted);
-        }
-        .calc-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 0.85rem;
-            font-weight: 500;
-            font-family: var(--font);
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-        .calc-btn:hover {
-            background: var(--accent-hover);
         }
         .result {
             display: none;
@@ -257,20 +214,24 @@
             border-color: var(--accent);
             color: var(--accent);
         }
+        .mode-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: #15803d;
+            margin-bottom: 16px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <div class="mode-badge">目標獲利模式</div>
             <h1>股票0成本計算器</h1>
-            <p>計算賣出股數，實現0成本持有</p>
-        </div>
-
-        <div class="card">
-            <div class="mode-toggle">
-                <button class="mode-btn active" onclick="setMode('basic')">基本模式</button>
-                <button class="mode-btn" onclick="setMode('profit')">目標獲利</button>
-            </div>
+            <p>計算賣出股數，實現目標獲利並持有</p>
         </div>
 
         <div class="card">
@@ -317,8 +278,6 @@
             </div>
         </div>
 
-        <button class="calc-btn" onclick="calculate()">計算</button>
-
         <div class="card result" id="result">
             <div class="result-header">計算結果</div>
             <div id="resultContent"></div>
@@ -327,23 +286,6 @@
     </div>
 
     <script>
-        let currentMode = 'basic';
-
-        function setMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            const profitSection = document.getElementById('profitSection');
-            if (mode === 'profit') {
-                profitSection.classList.add('show');
-                updateSliderRange();
-            } else {
-                profitSection.classList.remove('show');
-            }
-            document.getElementById('result').classList.remove('show');
-        }
-
         function formatNumber(num) {
             return num.toLocaleString('zh-HK', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
@@ -361,7 +303,6 @@
             const maxLabel = document.getElementById('maxProfitLabel');
 
             if (buyPrice > 0 && targetPrice > buyPrice && shares > 0) {
-                // 最大獲利 = 全部賣出在目標價 - 總成本
                 const totalCost = buyPrice * shares;
                 const maxProceeds = shares * targetPrice;
                 const maxProfit = maxProceeds - totalCost;
@@ -371,7 +312,6 @@
                 slider.value = Math.min(slider.value, slider.max);
                 maxLabel.textContent = slider.max + '%';
 
-                // Update profit value from slider
                 updateProfitFromSlider();
             } else {
                 slider.max = 100;
@@ -398,19 +338,22 @@
             const slider = document.getElementById('profitSlider');
             slider.value = Math.min(percent, parseInt(slider.max));
             updateProfitFromSlider();
+            calculate();
         }
 
-        // Listen to input changes to update slider range
+        // Listen to input changes to update slider range and auto-calculate
         ['buyPrice', 'shares', 'targetPrice'].forEach(id => {
             document.getElementById(id).addEventListener('input', () => {
-                if (currentMode === 'profit') {
-                    updateSliderRange();
-                }
+                updateSliderRange();
+                calculate();
             });
         });
 
         // Listen to slider changes
-        document.getElementById('profitSlider').addEventListener('input', updateProfitFromSlider);
+        document.getElementById('profitSlider').addEventListener('input', () => {
+            updateProfitFromSlider();
+            calculate();
+        });
 
         // Listen to manual profit input to update slider
         document.getElementById('targetProfit').addEventListener('input', () => {
@@ -428,34 +371,27 @@
                     percentValue.textContent = percent + '%';
                 }
             }
+            calculate();
         });
 
         function validateInputs() {
-            let valid = true;
             const buyPrice = parseFloat(document.getElementById('buyPrice').value);
             const shares = parseInt(document.getElementById('shares').value);
             const targetPrice = parseFloat(document.getElementById('targetPrice').value);
 
-            document.querySelectorAll('.error').forEach(e => e.style.display = 'none');
-
-            if (isNaN(buyPrice) || buyPrice <= 0) {
-                document.getElementById('buyPriceError').style.display = 'block';
-                valid = false;
+            if (isNaN(buyPrice) || buyPrice <= 0 || isNaN(shares) || shares <= 0 || isNaN(targetPrice) || targetPrice <= 0) {
+                return false;
             }
-            if (isNaN(shares) || shares <= 0) {
-                document.getElementById('sharesError').style.display = 'block';
-                valid = false;
-            }
-            if (isNaN(targetPrice) || targetPrice <= 0) {
-                document.getElementById('targetPriceError').style.display = 'block';
-                valid = false;
-            }
-
-            return valid;
+            return true;
         }
 
         function calculate() {
-            if (!validateInputs()) return;
+            const resultDiv = document.getElementById('result');
+
+            if (!validateInputs()) {
+                resultDiv.classList.remove('show');
+                return;
+            }
 
             const buyPrice = parseFloat(document.getElementById('buyPrice').value);
             const shares = parseInt(document.getElementById('shares').value);
@@ -463,107 +399,68 @@
             const targetProfit = parseFloat(document.getElementById('targetProfit').value) || 0;
 
             const totalCost = buyPrice * shares;
-            const resultDiv = document.getElementById('result');
             const resultContent = document.getElementById('resultContent');
             const summary = document.getElementById('summary');
 
-            if (currentMode === 'basic') {
-                // 基本模式：計算0成本需要賣出多少股
-                const sharesToSell = Math.ceil((totalCost / targetPrice) * 100) / 100;
-                const remainingShares = shares - sharesToSell;
-                const proceeds = sharesToSell * targetPrice;
-                const remainingCost = totalCost - proceeds;
+            const maxPossibleProfit = shares * (targetPrice - buyPrice);
 
+            if (targetProfit > maxPossibleProfit) {
                 resultContent.innerHTML = `
                     <div class="result-row">
-                        <span class="result-label">買入均價</span>
-                        <span class="result-value">HK$ ${formatNumber(buyPrice)}</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">買入股數</span>
-                        <span class="result-value">${formatShares(shares)} 股</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">總買入成本</span>
-                        <span class="result-value">HK$ ${formatNumber(totalCost)}</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">目標價格</span>
-                        <span class="result-value">HK$ ${formatNumber(targetPrice)}</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">需賣出股數</span>
-                        <span class="result-value highlight">${formatNumber(sharesToSell)} 股</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">賣出所得</span>
-                        <span class="result-value">HK$ ${formatNumber(proceeds)}</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">剩餘股數</span>
-                        <span class="result-value">${formatNumber(remainingShares)} 股</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">剩餘成本</span>
-                        <span class="result-value">HK$ ${formatNumber(remainingCost)}</span>
+                        <span class="result-label">錯誤</span>
+                        <span class="result-value" style="color: #E74C3C;">目標獲利超出最大可實現範圍</span>
                     </div>
                 `;
-
-                summary.innerHTML = `<p>賣出 <strong>${formatNumber(sharesToSell)}</strong> 股後，<br>剩餘 <strong>${formatNumber(remainingShares)}</strong> 股為0成本持有</p>`;
-            } else {
-                // 目標獲利模式
-                if (targetProfit > shares * (targetPrice - buyPrice)) {
-                    alert('目標獲利超出最大可實現範圍');
-                    return;
-                }
-
-                const targetProceeds = totalCost + targetProfit;
-                const sharesToSell = Math.ceil((targetProceeds / targetPrice) * 100) / 100;
-                const remainingShares = shares - sharesToSell;
-                const actualProfit = (sharesToSell * targetPrice) - totalCost;
-                const remainingCost = totalCost - (sharesToSell * targetPrice);
-
-                resultContent.innerHTML = `
-                    <div class="result-row">
-                        <span class="result-label">買入均價</span>
-                        <span class="result-value">HK$ ${formatNumber(buyPrice)}</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">買入股數</span>
-                        <span class="result-value">${formatShares(shares)} 股</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">總買入成本</span>
-                        <span class="result-value">HK$ ${formatNumber(totalCost)}</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">目標價格</span>
-                        <span class="result-value">HK$ ${formatNumber(targetPrice)}</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">目標獲利</span>
-                        <span class="result-value">HK$ ${formatNumber(targetProfit)}</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">需賣出股數</span>
-                        <span class="result-value highlight">${formatNumber(sharesToSell)} 股</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">賣出所得</span>
-                        <span class="result-value">HK$ ${formatNumber(targetProceeds)}</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">剩餘股數</span>
-                        <span class="result-value">${formatNumber(remainingShares)} 股</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label">剩餘成本</span>
-                        <span class="result-value">HK$ ${formatNumber(remainingCost)}</span>
-                    </div>
-                `;
-
-                summary.innerHTML = `<p>賣出 <strong>${formatNumber(sharesToSell)}</strong> 股，<br>獲利 <strong>HK$ ${formatNumber(targetProfit)}</strong>，<br>剩餘 <strong>${formatNumber(remainingShares)}</strong> 股為0成本持有</p>`;
+                summary.innerHTML = `<p>最大可實現獲利為 <strong>HK$ ${formatNumber(maxPossibleProfit)}</strong></p>`;
+                resultDiv.classList.add('show');
+                return;
             }
+
+            const targetProceeds = totalCost + targetProfit;
+            const sharesToSell = Math.ceil((targetProceeds / targetPrice) * 100) / 100;
+            const remainingShares = shares - sharesToSell;
+            const remainingCost = totalCost - (sharesToSell * targetPrice);
+
+            resultContent.innerHTML = `
+                <div class="result-row">
+                    <span class="result-label">買入均價</span>
+                    <span class="result-value">HK$ ${formatNumber(buyPrice)}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">買入股數</span>
+                    <span class="result-value">${formatShares(shares)} 股</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">總買入成本</span>
+                    <span class="result-value">HK$ ${formatNumber(totalCost)}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">目標價格</span>
+                    <span class="result-value">HK$ ${formatNumber(targetPrice)}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">目標獲利</span>
+                    <span class="result-value">HK$ ${formatNumber(targetProfit)}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">需賣出股數</span>
+                    <span class="result-value highlight">${formatNumber(sharesToSell)} 股</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">賣出所得</span>
+                    <span class="result-value">HK$ ${formatNumber(targetProceeds)}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">剩餘股數</span>
+                    <span class="result-value">${formatNumber(remainingShares)} 股</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">剩餘成本</span>
+                    <span class="result-value">HK$ ${formatNumber(remainingCost)}</span>
+                </div>
+            `;
+
+            summary.innerHTML = `<p>賣出 <strong>${formatNumber(sharesToSell)}</strong> 股，<br>獲利 <strong>HK$ ${formatNumber(targetProfit)}</strong>，<br>剩餘 <strong>${formatNumber(remainingShares)}</strong> 股為0成本持有</p>`;
 
             resultDiv.classList.add('show');
         }
