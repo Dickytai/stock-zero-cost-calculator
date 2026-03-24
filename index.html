@@ -10,186 +10,316 @@
             margin: 0;
             padding: 0;
         }
+        :root {
+            --bg-primary: #191919;
+            --bg-secondary: #242424;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --accent: #2ECC71;
+            --accent-hover: #27AE60;
+            --border: #333333;
+            --radius: 6px;
+            --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 40px 20px;
         }
         .container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 450px;
+            max-width: 480px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        h1 {
-            text-align: center;
-            color: #1a1a2e;
-            margin-bottom: 25px;
-            font-size: 1.5rem;
+        .header {
+            margin-bottom: 32px;
+        }
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
         }
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+        }
+        .input-group:last-child {
+            margin-bottom: 0;
         }
         label {
             display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
         }
-        input {
+        input[type="number"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: var(--font);
+            transition: border-color 0.15s;
         }
-        input:focus {
+        input[type="number"]:focus {
             outline: none;
-            border-color: #4CAF50;
+            border-color: var(--accent);
+        }
+        input[type="number"]::placeholder {
+            color: var(--text-muted);
         }
         .mode-toggle {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
         }
         .mode-btn {
             flex: 1;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            background: white;
-            border-radius: 10px;
+            padding: 10px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-family: var(--font);
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
+            transition: all 0.15s;
+        }
+        .mode-btn:hover {
+            border-color: var(--text-muted);
         }
         .mode-btn.active {
-            border-color: #4CAF50;
-            background: #4CAF50;
-            color: white;
+            background: var(--bg-primary);
+            border-color: var(--accent);
+            color: var(--text-primary);
         }
-        .optional-section {
+        .slider-section {
             display: none;
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
         }
-        .optional-section.show {
+        .slider-section.show {
             display: block;
         }
-        .optional-toggle {
+        .slider-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            cursor: pointer;
+            margin-bottom: 12px;
         }
-        .optional-toggle input {
-            width: auto;
+        .slider-value {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 500;
         }
-        button {
+        input[type="range"] {
             width: 100%;
-            padding: 15px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background 0.3s;
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
         }
-        button:hover {
-            background: #45a049;
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        .calc-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .calc-btn:hover {
+            background: var(--accent-hover);
         }
         .result {
-            margin-top: 20px;
-            padding: 20px;
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            border-radius: 10px;
-            color: white;
             display: none;
         }
         .result.show {
             display: block;
         }
-        .result-item {
+        .result-header {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .result-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
         }
-        .result-item:last-child {
+        .result-row:last-child {
             border-bottom: none;
         }
         .result-label {
-            opacity: 0.9;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
         }
         .result-value {
-            font-weight: bold;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
-        .highlight {
-            background: rgba(255,255,255,0.2);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
+        .result-value.highlight {
+            color: var(--accent);
+        }
+        .result-summary {
+            margin-top: 16px;
+            padding: 14px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
             text-align: center;
         }
-        .error {
-            color: #e74c3c;
+        .result-summary p {
             font-size: 0.85rem;
-            margin-top: 5px;
+            line-height: 1.6;
+        }
+        .result-summary strong {
+            color: var(--accent);
+        }
+        .error {
+            color: #E74C3C;
+            font-size: 0.7rem;
+            margin-top: 4px;
             display: none;
+        }
+        .quick-presets {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .preset-btn {
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .preset-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📈 股票0成本計算器</h1>
-        
-        <div class="mode-toggle">
-            <button class="mode-btn active" onclick="setMode('basic')">基本模式</button>
-            <button class="mode-btn" onclick="setMode('profit')">目標獲利模式</button>
+        <div class="header">
+            <h1>股票0成本計算器</h1>
+            <p>計算賣出股數，實現0成本持有</p>
         </div>
 
-        <div class="input-group">
-            <label>買入價格 (HKD)</label>
-            <input type="number" id="buyPrice" placeholder="例如：10.50" step="0.001" min="0">
-            <div class="error" id="buyPriceError">請輸入買入價格</div>
+        <div class="card">
+            <div class="mode-toggle">
+                <button class="mode-btn active" onclick="setMode('basic')">基本模式</button>
+                <button class="mode-btn" onclick="setMode('profit')">目標獲利</button>
+            </div>
         </div>
 
-        <div class="input-group">
-            <label>買入股數</label>
-            <input type="number" id="shares" placeholder="例如：1000" step="1" min="1">
-            <div class="error" id="sharesError">請輸入入股數</div>
+        <div class="card">
+            <div class="input-group">
+                <label>買入價格 (HKD)</label>
+                <input type="number" id="buyPrice" placeholder="0.00" step="0.001" min="0">
+                <div class="error" id="buyPriceError">請輸入買入價格</div>
+            </div>
+
+            <div class="input-group">
+                <label>買入股數</label>
+                <input type="number" id="shares" placeholder="0" step="1" min="1">
+                <div class="error" id="sharesError">請輸入入股數</div>
+            </div>
+
+            <div class="input-group">
+                <label>目標價格 (HKD)</label>
+                <input type="number" id="targetPrice" placeholder="0.00" step="0.001" min="0">
+                <div class="error" id="targetPriceError">請輸入目標價格</div>
+            </div>
         </div>
 
-        <div class="input-group">
-            <label>目標價格 (HKD)</label>
-            <input type="number" id="targetPrice" placeholder="例如：15.00" step="0.001" min="0">
-            <div class="error" id="targetPriceError">請輸入目標價格</div>
+        <div class="card slider-section" id="profitSection">
+            <div class="input-group">
+                <div class="slider-header">
+                    <label>目標獲利比率</label>
+                    <span class="slider-value" id="profitPercentValue">0%</span>
+                </div>
+                <input type="range" id="profitSlider" min="0" max="100" value="0" step="1">
+                <div class="slider-labels">
+                    <span>0%</span>
+                    <span id="maxProfitLabel">100%</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>目標獲利金額 (HKD)</label>
+                <input type="number" id="targetProfit" placeholder="0.00" step="0.01" min="0">
+                <div class="quick-presets">
+                    <button class="preset-btn" onclick="setProfitPreset(25)">25%</button>
+                    <button class="preset-btn" onclick="setProfitPreset(50)">50%</button>
+                    <button class="preset-btn" onclick="setProfitPreset(75)">75%</button>
+                    <button class="preset-btn" onclick="setProfitPreset(100)">100%</button>
+                </div>
+            </div>
         </div>
 
-        <div class="optional-section show" id="basicResultSection">
-            <div class="highlight" id="basicSummary"></div>
-        </div>
+        <button class="calc-btn" onclick="calculate()">計算</button>
 
-        <div class="optional-section" id="profitSection">
-            <label>目標獲利 (HKD)</label>
-            <input type="number" id="targetProfit" placeholder="例如：500" step="0.01" min="0">
-        </div>
-
-        <button onclick="calculate()">計算</button>
-
-        <div class="result" id="result">
+        <div class="card result" id="result">
+            <div class="result-header">計算結果</div>
             <div id="resultContent"></div>
-            <div class="highlight" id="summary"></div>
+            <div class="result-summary" id="summary"></div>
         </div>
     </div>
 
@@ -202,16 +332,13 @@
             event.target.classList.add('active');
             
             const profitSection = document.getElementById('profitSection');
-            const result = document.getElementById('result');
-            
             if (mode === 'profit') {
                 profitSection.classList.add('show');
-                document.getElementById('basicResultSection').classList.remove('show');
+                updateSliderRange();
             } else {
                 profitSection.classList.remove('show');
-                document.getElementById('basicResultSection').classList.add('show');
             }
-            result.classList.remove('show');
+            document.getElementById('result').classList.remove('show');
         }
 
         function formatNumber(num) {
@@ -222,13 +349,90 @@
             return num.toLocaleString('zh-HK');
         }
 
+        function updateSliderRange() {
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value) || 0;
+            const targetPrice = parseFloat(document.getElementById('targetPrice').value) || 0;
+            const shares = parseInt(document.getElementById('shares').value) || 0;
+
+            const slider = document.getElementById('profitSlider');
+            const maxLabel = document.getElementById('maxProfitLabel');
+
+            if (buyPrice > 0 && targetPrice > buyPrice && shares > 0) {
+                // 最大獲利 = 全部賣出在目標價 - 總成本
+                const totalCost = buyPrice * shares;
+                const maxProceeds = shares * targetPrice;
+                const maxProfit = maxProceeds - totalCost;
+                const maxProfitPercent = Math.round((maxProfit / totalCost) * 100);
+
+                slider.max = Math.max(0, maxProfitPercent);
+                slider.value = Math.min(slider.value, slider.max);
+                maxLabel.textContent = slider.max + '%';
+
+                // Update profit value from slider
+                updateProfitFromSlider();
+            } else {
+                slider.max = 100;
+                maxLabel.textContent = '100%';
+            }
+        }
+
+        function updateProfitFromSlider() {
+            const slider = document.getElementById('profitSlider');
+            const profitValue = document.getElementById('targetProfit');
+            const percentValue = document.getElementById('profitPercentValue');
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value) || 0;
+            const shares = parseInt(document.getElementById('shares').value) || 0;
+
+            if (buyPrice > 0 && shares > 0) {
+                const totalCost = buyPrice * shares;
+                const profit = totalCost * (slider.value / 100);
+                profitValue.value = profit.toFixed(2);
+                percentValue.textContent = slider.value + '%';
+            }
+        }
+
+        function setProfitPreset(percent) {
+            const slider = document.getElementById('profitSlider');
+            slider.value = Math.min(percent, parseInt(slider.max));
+            updateProfitFromSlider();
+        }
+
+        // Listen to input changes to update slider range
+        ['buyPrice', 'shares', 'targetPrice'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                if (currentMode === 'profit') {
+                    updateSliderRange();
+                }
+            });
+        });
+
+        // Listen to slider changes
+        document.getElementById('profitSlider').addEventListener('input', updateProfitFromSlider);
+
+        // Listen to manual profit input to update slider
+        document.getElementById('targetProfit').addEventListener('input', () => {
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value) || 0;
+            const shares = parseInt(document.getElementById('shares').value) || 0;
+            const profit = parseFloat(document.getElementById('targetProfit').value) || 0;
+            const slider = document.getElementById('profitSlider');
+            const percentValue = document.getElementById('profitPercentValue');
+
+            if (buyPrice > 0 && shares > 0) {
+                const totalCost = buyPrice * shares;
+                const percent = Math.round((profit / totalCost) * 100);
+                if (percent >= 0 && percent <= parseInt(slider.max)) {
+                    slider.value = percent;
+                    percentValue.textContent = percent + '%';
+                }
+            }
+        });
+
         function validateInputs() {
             let valid = true;
             const buyPrice = parseFloat(document.getElementById('buyPrice').value);
             const shares = parseInt(document.getElementById('shares').value);
             const targetPrice = parseFloat(document.getElementById('targetPrice').value);
 
-            // Reset errors
             document.querySelectorAll('.error').forEach(e => e.style.display = 'none');
 
             if (isNaN(buyPrice) || buyPrice <= 0) {
@@ -259,60 +463,57 @@
             const resultDiv = document.getElementById('result');
             const resultContent = document.getElementById('resultContent');
             const summary = document.getElementById('summary');
-            const basicSummary = document.getElementById('basicSummary');
 
             if (currentMode === 'basic') {
                 // 基本模式：計算0成本需要賣出多少股
-                // 賣出股數 × 目標價格 = 總成本
-                // 賣出股數 = 總成本 / 目標價格
                 const sharesToSell = Math.ceil((totalCost / targetPrice) * 100) / 100;
                 const remainingShares = shares - sharesToSell;
                 const proceeds = sharesToSell * targetPrice;
                 const remainingCost = totalCost - proceeds;
 
                 resultContent.innerHTML = `
-                    <div class="result-item">
-                        <span class="result-label">總買入成本</span>
-                        <span class="result-value">HK$ ${formatNumber(totalCost)}</span>
-                    </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">買入均價</span>
                         <span class="result-value">HK$ ${formatNumber(buyPrice)}</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">買入股數</span>
                         <span class="result-value">${formatShares(shares)} 股</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
+                        <span class="result-label">總買入成本</span>
+                        <span class="result-value">HK$ ${formatNumber(totalCost)}</span>
+                    </div>
+                    <div class="result-row">
                         <span class="result-label">目標價格</span>
                         <span class="result-value">HK$ ${formatNumber(targetPrice)}</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">需賣出股數</span>
-                        <span class="result-value" style="color: #FFD700;">${formatNumber(sharesToSell)} 股</span>
+                        <span class="result-value highlight">${formatNumber(sharesToSell)} 股</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">賣出所得</span>
                         <span class="result-value">HK$ ${formatNumber(proceeds)}</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">剩餘股數</span>
                         <span class="result-value">${formatNumber(remainingShares)} 股</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">剩餘成本</span>
                         <span class="result-value">HK$ ${formatNumber(remainingCost)}</span>
                     </div>
                 `;
 
-                summary.innerHTML = `
-                    賣出 <strong>${formatNumber(sharesToSell)}</strong> 股後，<br>
-                    剩餘 <strong>${formatNumber(remainingShares)}</strong> 股為0成本持有
-                `;
+                summary.innerHTML = `<p>賣出 <strong>${formatNumber(sharesToSell)}</strong> 股後，<br>剩餘 <strong>${formatNumber(remainingShares)}</strong> 股為0成本持有</p>`;
             } else {
                 // 目標獲利模式
-                // 總賣出所得 = 總成本 + 目標獲利
-                // 賣出股數 = (總成本 + 目標獲利) / 目標價格
+                if (targetProfit > shares * (targetPrice - buyPrice)) {
+                    alert('目標獲利超出最大可實現範圍');
+                    return;
+                }
+
                 const targetProceeds = totalCost + targetProfit;
                 const sharesToSell = Math.ceil((targetProceeds / targetPrice) * 100) / 100;
                 const remainingShares = shares - sharesToSell;
@@ -320,53 +521,45 @@
                 const remainingCost = totalCost - (sharesToSell * targetPrice);
 
                 resultContent.innerHTML = `
-                    <div class="result-item">
-                        <span class="result-label">總買入成本</span>
-                        <span class="result-value">HK$ ${formatNumber(totalCost)}</span>
-                    </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">買入均價</span>
                         <span class="result-value">HK$ ${formatNumber(buyPrice)}</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">買入股數</span>
                         <span class="result-value">${formatShares(shares)} 股</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
+                        <span class="result-label">總買入成本</span>
+                        <span class="result-value">HK$ ${formatNumber(totalCost)}</span>
+                    </div>
+                    <div class="result-row">
                         <span class="result-label">目標價格</span>
                         <span class="result-value">HK$ ${formatNumber(targetPrice)}</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">目標獲利</span>
                         <span class="result-value">HK$ ${formatNumber(targetProfit)}</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">需賣出股數</span>
-                        <span class="result-value" style="color: #FFD700;">${formatNumber(sharesToSell)} 股</span>
+                        <span class="result-value highlight">${formatNumber(sharesToSell)} 股</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">賣出所得</span>
                         <span class="result-value">HK$ ${formatNumber(targetProceeds)}</span>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">實際獲利</span>
-                        <span class="result-value">HK$ ${formatNumber(actualProfit)}</span>
-                    </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">剩餘股數</span>
                         <span class="result-value">${formatNumber(remainingShares)} 股</span>
                     </div>
-                    <div class="result-item">
+                    <div class="result-row">
                         <span class="result-label">剩餘成本</span>
                         <span class="result-value">HK$ ${formatNumber(remainingCost)}</span>
                     </div>
                 `;
 
-                summary.innerHTML = `
-                    賣出 <strong>${formatNumber(sharesToSell)}</strong> 股，<br>
-                    獲利 <strong>HK$ ${formatNumber(targetProfit)}</strong>，<br>
-                    剩餘 <strong>${formatNumber(remainingShares)}</strong> 股為0成本持有
-                `;
+                summary.innerHTML = `<p>賣出 <strong>${formatNumber(sharesToSell)}</strong> 股，<br>獲利 <strong>HK$ ${formatNumber(targetProfit)}</strong>，<br>剩餘 <strong>${formatNumber(remainingShares)}</strong> 股為0成本持有</p>`;
             }
 
             resultDiv.classList.add('show');
